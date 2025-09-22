@@ -1,0 +1,2 @@
+-- A senha '123456' criptografada com BCrypt é: $2a$10$3gMWc1A7800bLA8DB482v.82m29z.Y/03FBRG06FAL.Pk7DRkG7.S
+INSERT INTO usuarios(login, email, senha, ativo, role) VALUES('admin', 'admin@email.com', '$2a$10$3gMWc1A7800bLA8DB482v.82m29z.Y/03FBRG06FAL.Pk7DRkG7.S', true, 'GERENTE');
