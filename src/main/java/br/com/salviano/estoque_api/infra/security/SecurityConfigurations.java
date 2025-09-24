@@ -33,6 +33,8 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.POST, "/login").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/usuarios").permitAll();
 
+
+
                     //produtos
                     req.requestMatchers(HttpMethod.POST, "/api/produtos").hasRole("GERENTE");
                     req.requestMatchers(HttpMethod.DELETE, "/api/produtos/**").hasRole("GERENTE");
@@ -40,7 +42,8 @@ public class SecurityConfigurations {
 
                     //cliente
                     req.requestMatchers("/clientes/**").hasRole("GERENTE");
-
+                    //Dashboard
+                    req.requestMatchers("/dashboard/**").authenticated();
                     //comandas
                     req.requestMatchers("/comandas/**").authenticated();
 

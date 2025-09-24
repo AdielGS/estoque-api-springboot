@@ -3,6 +3,7 @@ package br.com.salviano.estoque_api.controller;
 import br.com.salviano.estoque_api.controller.dto.DadosDetalhamentoProduto;
 import br.com.salviano.estoque_api.model.Produto;
 import br.com.salviano.estoque_api.service.ProdutoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import java.util.List;
 import jakarta.transaction.Transactional;
+import br.com.salviano.estoque_api.controller.dto.DadosCadastroProduto;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/produtos")
@@ -23,9 +26,11 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<Produto> cadastrar (@RequestBody Produto produto){
-        Produto produtoSalvo = produtoService.cadastrar(produto);
-        return new ResponseEntity<>(produtoSalvo, HttpStatus.CREATED);
+    @Transactional
+    public ResponseEntity<Produto> cadastrar(@RequestBody @Valid DadosCadastroProduto dados, UriComponentsBuilder uriBuilder) {
+        var produtoSalvo = produtoService.cadastrar(dados);
+        var uri = uriBuilder.path("/api/produtos/{id}").buildAndExpand(produtoSalvo.getId()).toUri();
+        return ResponseEntity.created(uri).body(produtoSalvo);
     }
 
     @GetMapping

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import br.com.salviano.estoque_api.controller.dto.DadosCadastroProduto;
 
 @Service
 public class ProdutoService {
@@ -21,8 +22,26 @@ public class ProdutoService {
         this.produtoRepository = produtoRepository;
     }
 
-    public Produto cadastrar (Produto produto) {
-        return produtoRepository.save(produto);
+    @Transactional
+    public Produto cadastrar(DadosCadastroProduto dados) {
+        // Procura se já existe um produto com o mesmo nome
+        Optional<Produto> produtoExistenteOpt = produtoRepository.findByNomeIgnoreCase(dados.nome().trim());
+
+        if (produtoExistenteOpt.isPresent()) {
+            // Se existe, atualiza o estoque e outros dados
+            Produto produtoExistente = produtoExistenteOpt.get();
+            int novoEstoque = produtoExistente.getQuantidadeEmEstoque() + dados.quantidadeEmEstoque();
+            produtoExistente.setQuantidadeEmEstoque(novoEstoque);
+            produtoExistente.setPreco(dados.preco());
+            produtoExistente.setDescricao(dados.descricao());
+            produtoExistente.setAtivo(true); // Garante que ele fique/volte a ser ativo
+            return produtoRepository.save(produtoExistente);
+        } else {
+            // Se não existe, cria um novo produto usando o nosso construtor seguro.
+            // O "ativo = true" já está garantido dentro do construtor.
+            Produto novoProduto = new Produto(dados);
+            return produtoRepository.save(novoProduto);
+        }
     }
 
     public Page<DadosDetalhamentoProduto> listar(Pageable paginacao) {
